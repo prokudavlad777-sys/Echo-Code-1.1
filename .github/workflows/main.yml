@@ -1,0 +1,19 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "17" }
+      - name: Python tests
+        run: python -m unittest discover -s tests -v
+      - name: C++ client
+        run: g++ -std=c++17 -O2 -Wall -o echo_cli cli/echo_cli.cpp
+      - name: Rust guard
+        run: cargo build --release --manifest-path rust/Cargo.toml
+      - name: Java gateway
+        run: javac -d /tmp/gw java/EchoGateway.java
